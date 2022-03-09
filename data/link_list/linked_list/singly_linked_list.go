@@ -1,4 +1,4 @@
-package link_list
+package linked_list
 
 type SinglyLinkedList struct {
 	Id      int
