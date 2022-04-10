@@ -27,3 +27,24 @@ func TestSinglyLinkedList(t *testing.T) {
 		Data: "i am singly 99",
 	})
 }
+
+// singly linked list
+func TestDoubleLinkedList(t *testing.T) {
+	var link = NewDoubleLinkedList()
+	link.Append(&DoubleLinkedList{
+		Data: "data 1",
+	})
+	link.Append(&DoubleLinkedList{
+		Data: "data 50",
+	})
+	link.Append(&DoubleLinkedList{
+		Data: "data 31",
+	})
+	link.Push(1, &DoubleLinkedList{
+		Data: "data 311111",
+	})
+
+	link.DelId(1)
+
+	fmt.Println(link)
+}

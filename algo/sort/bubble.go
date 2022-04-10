@@ -87,3 +87,45 @@ func quickAscendingSort(arr []int, start, end int) {
 		}
 	}
 }
+
+//CountingSort 计数排序
+func CountingSort(arr []int, MaxVal int) {
+	var assistArr = make([]int, MaxVal+1)
+	for _, v := range arr {
+		assistArr[v] += 1
+	}
+	var key int
+	for k, v := range assistArr {
+		for i := 0; i < v; i++ {
+			arr[key] = k
+			key++
+		}
+	}
+}
+func MergeSort(array []int) []int {
+	n := len(array)
+	if n < 2 {
+		return array
+	}
+	key := n / 2
+	left := MergeSort(array[0:key])
+	right := MergeSort(array[key:])
+	return merge(left, right)
+}
+
+func merge(left []int, right []int) []int {
+	tmp := make([]int, 0)
+	i, j := 0, 0
+	for i < len(left) && j < len(right) {
+		if left[i] < right[j] {
+			tmp = append(tmp, left[i])
+			i++
+		} else {
+			tmp = append(tmp, right[j])
+			j++
+		}
+	}
+	tmp = append(tmp, left[i:]...)
+	tmp = append(tmp, right[j:]...)
+	return tmp
+}

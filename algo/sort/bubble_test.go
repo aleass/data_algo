@@ -11,6 +11,9 @@ func TestBubble(t *testing.T) {
 	//insertSort(data)
 	//selectionSort(data)
 	//shellSort(data)
-	quickAscendingSort(data, 0, len(data)-1)
+	//quickAscendingSort(data, 0, len(data)-1)
+	//CountingSort(data, 36)
+	//merge(data, []int{1, 8, 6, 2, 58, 2, 8, 2, 5})
+	data = MergeSort(data)
 	fmt.Println(data)
 }
