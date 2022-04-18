@@ -25,7 +25,3 @@ func TestName(t *testing.T) {
 
 }
 
-func TestName2(t *testing.T) {
-	var s uint64 = 0xFFFFFFFFFFFFFFFF
-	println(s)
-}
