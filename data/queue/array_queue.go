@@ -2,8 +2,6 @@ package queue
 
 import (
 	"errors"
-	"sync/atomic"
-	"time"
 )
 
 const (
@@ -12,36 +10,44 @@ const (
 )
 
 type ArrayQueue struct {
-	data [1000]*int64
-	head int64
-	tail int64
+	data  []interface{}
+	head  int64
+	tail  int64
+	len   int64 //  size of the circular queue
+	count int64 // total data in the queue
 }
 
-func NewArrayQueue() *ArrayQueue {
-	return &ArrayQueue{}
+func NewArrayQueue(l int64) *ArrayQueue {
+	return &ArrayQueue{
+		data: make([]interface{}, l),
+		len:  l,
+	}
 }
 
-//Enqueue output data
-func (q *ArrayQueue) Enqueue(val *int64) error {
-	if q.tail-q.head >= int64(len(q.data)) {
+//Enqueue input data
+func (q *ArrayQueue) Enqueue(val interface{}) error {
+	if q.count == q.len {
 		return errors.New(FullErr)
 	}
-top:
-	t := q.tail
-	for !atomic.CompareAndSwapInt64(&q.tail, t, t+1) {
-		time.Sleep(22000)
-		goto top
+	q.data[q.tail] = val
+	q.count++
+	q.tail++
+	if q.tail == q.len {
+		q.tail = 0
 	}
-	q.data[t%int64(len(q.data))] = val
 	return nil
 }
 
 // Dequeue out data
-func (q *ArrayQueue) Dequeue() (*int64, error) {
-	if q.head == q.tail {
+func (q *ArrayQueue) Dequeue() (interface{}, error) {
+	if q.count == 0 {
 		return nil, errors.New(NilErr)
 	}
-	t := q.head
-	atomic.AddInt64(&q.head, 1)
-	return q.data[t%int64(len(q.data))], nil
+	var val = q.data[q.head]
+	q.head++
+	q.count--
+	if q.head == q.len {
+		q.head = 0
+	}
+	return val, nil
 }

@@ -1,57 +1,50 @@
 package queue
 
-import (
-	"sync/atomic"
-	"time"
-)
+import "errors"
 
 type Node struct {
-	value *int64
-	next  *Node
+	value interface{}
+	next  *Node //next node
+	pre   *Node //pre node
 }
 
 type LinkedListQueue struct {
-	head *Node
-	tail *Node
-	Size int64
-	lock int64 //atomic instead of sync.Mutex
-	//lock sync.Mutex //sync.Mutex
+	head  *Node
+	size  int64
+	count int64
 }
 
-func NewLinkedList() *LinkedListQueue {
-	return &LinkedListQueue{}
-}
-
-func (q *LinkedListQueue) Enqueue(value *int64) {
-	node := &Node{value: value}
-	//q.lock.Lock()
-	//defer q.lock.Unlock() //lock : close top:code
-top:
-	if !atomic.CompareAndSwapInt64(&q.lock, 0, 1) {
-		time.Sleep(22500)
-		goto top
+func NewLinkedList(l int64) *LinkedListQueue {
+	return &LinkedListQueue{
+		size: l,
 	}
-	goto end
-end:
+}
+
+func (q *LinkedListQueue) Enqueue(value interface{}) {
+	if q.count == q.size {
+		return
+	}
+	n := &Node{
+		value: value,
+	}
+	q.count++
 	if q.head == nil {
-		q.head = node
-		q.tail = node
-	} else {
-		q.tail.next = node
-		q.tail = node
+		q.head = n
+		q.head.pre = n
+		return
 	}
-	q.Size++
-	if !atomic.CompareAndSwapInt64(&q.lock, 1, 0) {
-		panic("unlock failed")
-	}
+	n.pre = q.head.pre
+	q.head.pre.next = n
+	q.head.pre = n
+	return
 }
 
-func (q *LinkedListQueue) Dequeue() *int64 {
-	if q.head == nil {
-		return nil
+func (q *LinkedListQueue) Dequeue() (interface{}, error) {
+	if q.count == 0 {
+		return nil, errors.New(NilErr)
 	}
-	value := q.head.value
-	q.head = q.head.next
-	q.Size--
-	return value
+	val := q.head
+	q.head = val.next
+	q.count--
+	return val, nil
 }
